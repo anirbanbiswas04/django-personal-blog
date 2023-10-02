@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load extras %}
+{% block title %}{{post.title}} | {% endblock title %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8 is-offset-2">
+                    <div class="content is-medium">
+                        {% if post.image %}
+                        <img class="mb-6" src="{{ post.image.url }}">
+                        {% endif %}
+                        <p class="subtitle has-text-weight-light">{{ post.created_at|date:'M-d-Y H:i' }}</p>
+                        <h1 class="title">{{ post.title }}</h1>
+                        <p class="has-text-weight-semibold">{{ post.intro }}</p>
+                        <span class="is-underlined">No. of words: {{ post.body|wordcount }}</span>
+                        <p class="body">{{ post.body|markdown|safe }}</p>
+
+                        <p>
+                            <small>Category: <a href="{% url 'category_detail' post.category.slug %}">
+                                {{ post.category}}
+                            </a></small>
+                        </p>
+
+                        {% if related %}
+                        <hr>
+                        <h2 class="subtitle is-4">Related Blogs</h2>
+                        {% for post in related %}
+                        <div>
+                            <a href="{% url 'detail' post.category.slug post.slug %}">
+                                <p class="subtitle has-text-weight-light has-text-grey-light">
+                                    {{ post.created_at|timesince}} ago
+                                </p>
+                                <h1 class="title">{{ post.title }}</h1>
+                                <p>{{ post.intro|truncatewords:20 }}</p>
+                                <p class="has-text-grey-light">{{post.category.title}}</p>
+                            </a>
+                        </div>
+                        {% if not forloop.last %}
+                        <hr>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        <hr>
+                        <h2 class="subtitle is-4">Comments</h2>
+                        <form method="post" class="mb-6">
+                            {% csrf_token %}
+                            {{form.as_p}}
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button is-link mt-3">Submit comment</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        {% for comment in post.comments.all %}
+                        <article>
+                            <div class="is-flex is-align-items-center is-justify-content-space-between">
+                                <strong>{{ comment.name }}</strong>
+                                <small class="has-text-grey-light mt-1">{{ comment.created_at|timesince }} ago</small>
+                            </div>
+                            {{ comment.body }}
+                        </article>
+                        {% if not forloop.last %}
+                        <hr>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

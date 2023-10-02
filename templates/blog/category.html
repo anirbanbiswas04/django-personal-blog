@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.title }} | {% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8 is-offset-2">
+                    <div class="content is-medium">
+                        <h3>Category "{{ category.title }}"</h3>
+                    </div>
+                    {% for post in posts %}
+                    <div class="content is-medium">
+                        <a href="{% url 'detail' post.category.slug post.slug %}">
+                            <p class="subtitle has-text-weight-light">{{ post.created_at|timesince }} ago</p>
+                            <h1 class="title">{{ post.title }}</h1>
+                            <p>{{ post.intro|truncatewords:20 }}</p>
+                        </a>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr>
+                    {% endif %}
+                    {% empty %}
+                    <div class="content">
+                        <p>There is no posts in this category...</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+                {% if posts.has_previous %}
+                <a href="{% url 'category_detail' category.slug %}?page={{posts.previous_page_number}}"
+                   class="pagination-previous">Previous</a>
+                {% else %}
+                <a class="pagination-previous" style="visibility:hidden;">Previous</a>
+                {% endif %}
+                {% if posts.has_next %}
+                <a href="{% url 'category_detail' category.slug %}?page={{posts.next_page_number}}"
+                   class="pagination-next">Next page</a>
+                {% else %}
+                <a class="pagination-next" style="visibility:hidden;">Next page</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</section>
+{% endblock %}
